@@ -6,10 +6,11 @@ public class Process {
     int waitingTime;
     int turnarroundTime;
     int priority;
-    public Process(String id,int arrivalTime,int burstTime){
+    public Process(String id,int arrivalTime,int burstTime,int priority){
         this.id=id;
         this.arrivalTime=arrivalTime;
         this.burstTime=burstTime;
         this.remainingTime=burstTime;
+        this.priority=priority;
     }
 }
