@@ -7,6 +7,8 @@ public class Process {
     int turnarroundTime;
     int completionTime;
     int priority;
+    int responseTime;
+    int firstStartTime = -1;
     public Process(String id,int arrivalTime,int burstTime,int priority){
         this.id=id;
         this.arrivalTime=arrivalTime;
