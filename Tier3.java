@@ -1,1 +1,2 @@
-
+public class Tier3 {
+}
