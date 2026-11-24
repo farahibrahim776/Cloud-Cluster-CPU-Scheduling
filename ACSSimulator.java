@@ -19,10 +19,27 @@ public class ACSSimulator {
     }
 
     public void runSimulation() {
-        Process pr=tier1.getNextProcess();
-        int execTime=Math.min(pr.remainingTime,tier1.getQuantum());
-        pr.remainingTime=-execTime;
-        currentTime+=execTime;
+        int completed=0;
+        int index=0;
+        while (completed<allProcesses.size()){
+            while(index<allProcesses.size() &&allProcesses.get(index).arrivalTime<=currentTime) {
+                tier1.addProcess(allProcesses.get(index));
+                index++;
+            }
+        if(!tier1.isEmpty()) {
+            Process pr = tier1.getNextProcess();
+            int execTime = Math.min(pr.remainingTime, tier1.getQuantum());
+            pr.remainingTime -= execTime;
+            currentTime += execTime;
+            if (pr.remainingTime == 0) {
+                pr.completionTime = currentTime;
+                completed++;
+            } else {
+                tier2.addProcess(pr);
+            }
+        }
+        }
+
     }
 
     public void printResults() {

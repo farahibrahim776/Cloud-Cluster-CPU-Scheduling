@@ -5,6 +5,7 @@ public class Process {
     int arrivalTime;
     int waitingTime;
     int turnarroundTime;
+    int completionTime;
     int priority;
     public Process(String id,int arrivalTime,int burstTime,int priority){
         this.id=id;
