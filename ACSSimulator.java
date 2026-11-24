@@ -38,8 +38,21 @@ public class ACSSimulator {
                 tier2.addProcess(pr);
             }
         }
+        else if(!tier2.isEmpty()) {
+            Process pr = tier2.getNextProcess();
+            int execTime = pr.remainingTime;
+            pr.remainingTime -= execTime;
+            currentTime += execTime;
+            if (pr.remainingTime == 0) {
+                pr.completionTime = currentTime;
+                completed++;
+            }
         }
-
+        else if(tier1.isEmpty() && tier2.isEmpty() && index<allProcesses.size()){
+            currentTime = allProcesses.get(index).arrivalTime;
+        }
+    }
+    
     }
 
     public void printResults() {
