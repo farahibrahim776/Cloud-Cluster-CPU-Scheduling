@@ -1,5 +1,4 @@
 import java.util.LinkedList;
-import java.util.Queue;
 
 public class Tier1 {
     private LinkedList<Process> queue;
@@ -21,4 +20,7 @@ public class Tier1 {
         return queue.isEmpty();
     }
 
+     public String snapshot() {
+        return queue.isEmpty() ? "[Empty]" : queue.toString();
+    }
 }

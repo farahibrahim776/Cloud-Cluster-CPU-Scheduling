@@ -47,5 +47,17 @@ public class Tier2 {
     public boolean isEmpty() {
         return queue.isEmpty();
     }
-}
+    
+    public List<Process> getProcesses() {
+        return new ArrayList<>(queue);
+    }
+    
+    public String snapshot() {
+        if (queue.isEmpty()) return "[Empty]";
 
+        List<Process> list = new ArrayList<>(queue);
+        list.sort((a, b) -> Integer.compare(a.getTier2EntryTime(), b.getTier2EntryTime()));
+        return list.toString();
+    }
+
+}

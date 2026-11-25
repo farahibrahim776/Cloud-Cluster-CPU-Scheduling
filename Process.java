@@ -43,4 +43,10 @@ public class Process {
         this.tier2EntryTime = currentTime;
         this.effectivePriority = this.initialPriority;
     }
+
+
+    // @Override
+    public String toString() {
+        return id + " (remaining: " + remainingTime + ", Priority: " + effectivePriority + ")";
+    }
 }
