@@ -22,10 +22,17 @@ public class Main {
             processes.add(new Process(id, arrival, burst, priority));
         }
 
-        System.out.print("Quantum  Context-switch  Aging-interval: ");
+        System.out.print("Quantum: ");
         int quantum = sc.nextInt();
+        System.out.print("Context-switch: ");
         int cs = sc.nextInt();
+        System.out.print("Aging-interval: ");
         int agingInterval = sc.nextInt();
+        while(agingInterval == 0){
+            System.out.print("Aging-interval should be greater than zero!");
+            System.out.print("Aging-interval: ");
+            agingInterval = sc.nextInt();
+        }
 
          // run simulation
         System.out.println("\n===== ACS (Q=" + quantum + ", CS=" + cs + ", aging=" + agingInterval + ") ====="
