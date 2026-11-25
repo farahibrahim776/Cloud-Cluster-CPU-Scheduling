@@ -14,7 +14,6 @@ public class ACSSimulator {
     private Tier1 tier1;
     private Tier2 tier2;
     private String pad = "               ";
-    private StringBuilder log = new StringBuilder();
     public ACSSimulator(List<Process> processes, int quantum, int contextSwitch, int agingInterval) {
         this.allProcesses = processes;
         this.tier1 = new Tier1(quantum);
@@ -136,8 +135,7 @@ public class ACSSimulator {
                 tier2.addProcess(p, currentTime);
             }
 
-            System.out.printf("%-6d%-9sTier 1: %s%n%sTier 2: %s%n", currentTime, "", tier1.snapshot(), pad,
-                    tier2.snapshot());
+            System.out.printf("%-6d%-9sTier 1: %s%n%sTier 2: %s%n", currentTime, "", tier1.snapshot(), pad, tier2.snapshot());
             for (Process pro : allProcesses) {
                 pro.turnarroundTime = pro.completionTime - pro.arrivalTime;
                 pro.waitingTime = pro.turnarroundTime - pro.burstTime;
@@ -156,12 +154,5 @@ public class ACSSimulator {
         }
         System.out.printf("Average Turnaround Time: %.2f%nAverage Waiting Time:     %.2f%n",
                 totalTAT / allProcesses.size(), totalWT / allProcesses.size());
-    }
-    public String getLog() {
-        return log.toString();
-    }
-
-    public List<String> getTimeline() {
-        return timeline;
     }
 }
