@@ -34,9 +34,7 @@ public class Main {
             agingInterval = sc.nextInt();
         }
 
-         // run simulation
-        System.out.println("\n===== ACS (Q=" + quantum + ", CS=" + cs + ", aging=" + agingInterval + ") ====="
-        );
+        System.out.println("\n===== ACS (Q=" + quantum + ", CS=" + cs + ", aging=" + agingInterval + ") =====");
 
         ACSSimulator simulator = new ACSSimulator(processes,quantum,cs,agingInterval);
 
