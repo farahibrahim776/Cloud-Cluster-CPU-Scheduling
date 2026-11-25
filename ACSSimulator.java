@@ -6,23 +6,21 @@ public class ACSSimulator {
     private int currentTime = 0;
     private int contextSwitch;
     private int agingInterval;
-
     private List<Process> allProcesses;
     private List<Process> admitted = new ArrayList<>();
     private Process lastProcess;
-    private List<String> timeline;
     private Tier1 tier1;
     private Tier2 tier2;
-    private String pad = "               ";
+    private String lastLabel = "";
+
     public ACSSimulator(List<Process> processes, int quantum, int contextSwitch, int agingInterval) {
         this.allProcesses = processes;
         this.tier1 = new Tier1(quantum);
         this.tier2 = new Tier2();
-
         this.contextSwitch = contextSwitch;
         this.agingInterval = agingInterval;
-        this.timeline = new ArrayList<>();
     }
+
     private void addArrival() {
         for (Process p : allProcesses) {
             if (p.arrivalTime <= currentTime && !admitted.contains(p)) {
@@ -33,16 +31,10 @@ public class ACSSimulator {
     }
     private void timeUnitPass(String label, String text) {
 
-        if (text == null)
-            text = "Tier 1: " + tier1.snapshot() + "\n" + pad + "Tier 2: " + tier2.snapshot();
-
-
-        String last = timeline.isEmpty() ? "" : timeline.get(timeline.size() - 1);
-        String name = (label.equals(last) || label.equals("CS")) ? "" : label;
-
-        System.out.printf("%-6d%-9s%s%n", currentTime, name, text == null ? "" : text);
-
-        timeline.add(label);
+        if (text == null)  text = "Tier 1: " + tier1.snapshot() + "\n" + "               " + "Tier 2: " + tier2.snapshot();
+        String name = (label.equals(lastLabel) || label.equals("CS")) ? "" : label;
+        System.out.printf("%-6d%-9s%s%n", currentTime, name, text);
+        lastLabel = label;
         currentTime++;
         addArrival();
     }
@@ -56,11 +48,10 @@ public class ACSSimulator {
             if (tier1.isEmpty() && !tier2.isEmpty()) {
                 tier2.updateAging(currentTime, agingInterval);
             }
-
             List<Process> waiting = tier2.getProcesses();
             waiting.sort(Comparator.comparingInt(Process::getTier2EntryTime));
 
-            if (waiting.size() > 1 && waiting.stream().anyMatch(p -> p.getEffectivePriority() != p.getInitialPriority())) {
+            if (waiting.stream().anyMatch(p -> p.getEffectivePriority() != p.getInitialPriority())) {
                 for (Process w : waiting) {
                     int waited = currentTime - w.getTier2EntryTime();
                     int levels = waited / agingInterval;
@@ -78,49 +69,48 @@ public class ACSSimulator {
                     System.out.println(line + w.getEffectivePriority());
                 }
             }
+            Process candidate = null;
+            if (!tier1.isEmpty())  candidate = tier1.peekNextProcess();
+            else if (!tier2.isEmpty()) candidate = tier2.peekNextProcess();
+            if (candidate == null) {
+                lastProcess = null;
+                timeUnitPass("Idle", null);
+                continue;
+            }
+            boolean switched = lastProcess != null && lastProcess != candidate && contextSwitch > 0;
 
-            String before = "Tier 1: " + tier1.snapshot() + "\n" + pad + "Tier 2: " + tier2.snapshot();
+            if (switched) {
+                String note = "Context switch";
+                if (lastProcess.remainingTime > 0)
+                    note += " saves " + lastProcess.id;
+                for (int i = 0; i < contextSwitch; ++i) {
+                    if (i == 0)  timeUnitPass("CS", note);
+                    else  timeUnitPass("CS", null);
+                }
+            }
+
+            if (switched && tier1.isEmpty() && !tier2.isEmpty())
+                tier2.updateAging(currentTime, agingInterval);
 
             Process p = null;
 
             if (!tier1.isEmpty())
                 p = tier1.getNextProcess();
-            else if (!tier2.isEmpty()) {
+            else if (!tier2.isEmpty())
                 p = tier2.getNextProcess();
-            }
+            String before = "Tier 1: " + tier1.snapshot() + "\n" + "               " + "Tier 2: " + tier2.snapshot();
 
-            if (p == null) {
-                lastProcess = null;
-                timeUnitPass("Idle", null);
-                continue;
-            }
-
-            if (lastProcess != null && lastProcess != p && contextSwitch > 0) {
-                String note = "Context switch " + (lastProcess.remainingTime > 0 ? "saves " + lastProcess.id + " and loads " : "loads ") + p.id;
-
-                for (int i = 0; i < contextSwitch; ++i) {
-                    if (i == 0)
-                        timeUnitPass("Cs", note + "\n" + pad);
-                    else {
-                        timeUnitPass("Cs", null);
-                    }
-                }
-            }
-
-            if (p.firstStartTime == -1)
-                p.firstStartTime = currentTime;
-
+            if (p.firstStartTime == -1)  p.firstStartTime = currentTime;
 
             int slice;
             if (p.getTier2EntryTime() == -1)
                 slice = Math.min(tier1.getQuantum(), p.remainingTime);
-            else {
+            else
                 slice = p.remainingTime;
-            }
+
 
             for (int i = 0; i < slice; ++i) {
-                if (i == 0)
-                    timeUnitPass(p.id, before);
+                if (i == 0)  timeUnitPass(p.id, before);
                 else {
                     timeUnitPass(p.id, null);
                 }
@@ -131,16 +121,15 @@ public class ACSSimulator {
             if (p.remainingTime == 0) {
                 p.completionTime = currentTime;
                 completed++;
-            } else {
+            } else
                 tier2.addProcess(p, currentTime);
-            }
 
-            System.out.printf("%-6d%-9sTier 1: %s%n%sTier 2: %s%n", currentTime, "", tier1.snapshot(), pad, tier2.snapshot());
-            for (Process pro : allProcesses) {
-                pro.turnarroundTime = pro.completionTime - pro.arrivalTime;
-                pro.waitingTime = pro.turnarroundTime - pro.burstTime;
-                pro.responseTime = pro.firstStartTime - pro.arrivalTime;
-            }
+            System.out.printf("%-6d%-9sTier 1: %s%n%sTier 2: %s%n", currentTime, "", tier1.snapshot(), "               ", tier2.snapshot());
+        }
+        for (Process pro : allProcesses) {
+            pro.turnarroundTime = pro.completionTime - pro.arrivalTime;
+            pro.waitingTime = pro.turnarroundTime - pro.burstTime;
+            pro.responseTime = pro.firstStartTime - pro.arrivalTime;
         }
     }
 

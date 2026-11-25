@@ -6,8 +6,10 @@ public class Tier2 {
     private PriorityQueue<Process> queue;
 
     public Tier2() {
-      queue = new PriorityQueue<>((p1, p2) -> Integer.compare(p1.getEffectivePriority(), p2.getEffectivePriority())
-        );
+        queue = new PriorityQueue<>((p1, p2) -> {int result = Integer.compare(p1.getEffectivePriority(), p2.getEffectivePriority());
+            if (result == 0) return Integer.compare(p1.getTier2EntryTime(), p2.getTier2EntryTime());
+            return result;
+        });
     }
     public void addProcess(Process p, int currentTime) {
         p.enterTier2(currentTime);
@@ -21,17 +23,11 @@ public class Tier2 {
         queue.addAll(waitingProcesses);
     }
 
-    public Process getNextProcess() {
-        return queue.poll();
-    }
-
-    public boolean isEmpty() {
-        return queue.isEmpty();
-    }
+    public Process getNextProcess() {return queue.poll();}
+    public Process peekNextProcess() {return queue.peek();}
+    public boolean isEmpty() {return queue.isEmpty();}
     
-    public List<Process> getProcesses() {
-        return new ArrayList<>(queue);
-    }
+    public List<Process> getProcesses() {return new ArrayList<>(queue);}
     
     public String snapshot() {
         if (queue.isEmpty()) return "[Empty]";

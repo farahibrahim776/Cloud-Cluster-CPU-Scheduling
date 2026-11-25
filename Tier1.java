@@ -16,6 +16,7 @@ public class Tier1 {
     public Process getNextProcess(){
         return queue.poll();
     }
+    public Process peekNextProcess() {return queue.peek();}
     public boolean isEmpty(){
         return queue.isEmpty();
     }
