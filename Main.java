@@ -134,13 +134,13 @@ public class Main {
     }
     public static void printResults(List<Process> processes) {
 
-        System.out.printf("%n%-9s%-9s%-7s%-8s%-12s%-9s%-9s%n", "Process", "Arrival", "Finish", "Turnaround", "Waiting");
+        System.out.printf("%n%-10s%-10s%-10s%-12s%-10s%n", "Process", "Arrival", "Finish", "Turnaround", "Waiting");
 
         double totalWT = 0;
         double totalTAT = 0;
 
         for (Process p : processes) {
-            System.out.printf("%-9s%-9d%-7d%-8d%-12d%-9d%-9d%n", p.id, p.arrivalTime, p.completionTime, p.turnarroundTime, p.waitingTime);
+            System.out.printf("%n%-10s%-10s%-10s%-12s%-10s%n", p.id, p.arrivalTime, p.completionTime, p.turnarroundTime, p.waitingTime);
             totalWT += p.waitingTime;
             totalTAT += p.turnarroundTime;
         }
